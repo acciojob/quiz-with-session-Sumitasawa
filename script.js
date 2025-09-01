@@ -28,8 +28,14 @@ const questions = [
     choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"],
     answer: "Ottawa",
   },
+	
 ];
 
+const questionsElement=document.getElementById("questions");
+const button=document.getElementById("submit");
+const scoreElement=document.getElementById("score");
+
+let userAnswers = JSON.parse(sessionStorage.getItem("progress")) || {};
 // Display the quiz questions and choices
 function renderQuestions() {
   for (let i = 0; i < questions.length; i++) {
@@ -46,6 +52,12 @@ function renderQuestions() {
       if (userAnswers[i] === choice) {
         choiceElement.setAttribute("checked", true);
       }
+		choiceElement.addEventListener('change',()=>{
+		 userAnswers[i] = choice;
+        sessionStorage.setItem("progress", JSON.stringify(userAnswers));
+		})
+
+		
       const choiceText = document.createTextNode(choice);
       questionElement.appendChild(choiceElement);
       questionElement.appendChild(choiceText);
@@ -54,3 +66,22 @@ function renderQuestions() {
   }
 }
 renderQuestions();
+
+button.addEventListener('click',()=>{
+	let score=0;
+
+	for(let i=0;i<questions.length;i++){
+		if(userAnswers[i]===questions[i].answer){
+			score++;
+		}
+	}
+
+	scoreElement.textContent=`Your score is ${score} out of ${questions.length}.`;
+	  localStorage.setItem("score", score);
+	sessionStorage.removeItem("progress");
+});
+
+const lastScore = localStorage.getItem("score");
+if (lastScore !== null) {
+  scoreElement.textContent = `Your last score was ${lastScore} out of ${questions.length}.`;
+}
